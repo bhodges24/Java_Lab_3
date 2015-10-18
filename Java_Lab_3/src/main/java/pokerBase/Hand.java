@@ -49,11 +49,15 @@ public class Hand {
 		return num_jokers;
 				
 	}
+	public int isNatural(){
+		return this.isNatural;
+	}
 	
 	public Hand()
 	{
 		
 	}
+	
 	public void  AddCardToHand(Card c)
 	{
 		if (this.CardsInHand == null)
@@ -136,7 +140,7 @@ public class Hand {
 		
 		//Loop over cards in each Hand
 		for(Hand hand : my_hands){
-			//Check if hand has a Joker or wild at position sub_card_num
+			//Check if hand has a Joker or wild at position wild_location
 			if(hand.GetCardFromHand(wild_location).getRank() == eRank.JOKER || 
 					hand.GetCardFromHand(wild_location).getWild() == true){
 				
@@ -173,6 +177,7 @@ public class Hand {
 	/*Create ExplodeHands method to implement SubstituteHand
 	 * for one or more wild cards*/
 	private static ArrayList<Hand> ExplodeHands(Hand my_hand){
+
 		//Create ArrayList of hands to hold all possible permutations of my_hand
 		ArrayList<Hand> all_possible_hands = new ArrayList<Hand>();
 		all_possible_hands.add(my_hand);
@@ -284,6 +289,7 @@ public class Hand {
 				&& Ace) {
 			ScoreHand(eHandStrength.RoyalFlush, 0, 0, null);
 		}
+		
 
 		// Straight Flush
 		else if (Straight == true && Flush == true) {
@@ -368,13 +374,13 @@ public class Hand {
 		}
 
 		// Straight
+		
 		else if (Straight) {
 			remainingCards = null;
 			ScoreHand(eHandStrength.Straight,
 					CardsInHand.get(eCardNo.FirstCard.getCardNo()).getRank()
 							.getRank(), 0, remainingCards);
 		}
-
 		// Three of a Kind
 		else if (CardsInHand.get(eCardNo.FirstCard.getCardNo()).getRank() == CardsInHand
 				.get(eCardNo.ThirdCard.getCardNo()).getRank()) {
@@ -516,25 +522,29 @@ public class Hand {
 	
 	//Create BestCardsInHand function
 			
-	}
 
 	/**
 	 * Custom sort to figure the best hand in an array of hands
 	 */
+/**
+ * Custom sort to figure the best hand in an array of hands
+ */
+
 public static Comparator<Hand> HandRank = new Comparator<Hand>() {
 
 	public int compare(Hand h1, Hand h2) {
-
+		
 		int result = 0;
-
-		result = h2.isNatural - h1.isNatural;
-		if (result != 0)
-		{
+		//Added comparator for whether a hand is natural (ie no Wilds)
+		result = h2.isNatural() - h1.isNatural();
+		
+		if (result != 0){
 			return result;
 		}
 		result = h2.getHandStrength() - h1.getHandStrength();
 
 		if (result != 0) {
+
 			return result;
 		}
 
@@ -547,42 +557,98 @@ public static Comparator<Hand> HandRank = new Comparator<Hand>() {
 		if (result != 0) {
 			return result;
 		}
-		/*
-		 * if ((h1.Kickers != null) && (h2.Kickers != null)) { if
-		 * (h2.getKicker().get(eCardNo.FirstCard.getCardNo()) != null) { if
-		 * (h1.getKicker().get(eCardNo.FirstCard.getCardNo()) != null) {
-		 * result =
-		 * h2.getKicker().get(eCardNo.FirstCard.getCardNo()).getRank().
-		 * getRank() -
-		 * h1.getKicker().get(eCardNo.FirstCard.getCardNo()).getRank().
-		 * getRank(); } if (result != 0) { return result; } }
-		 * 
-		 * 
-		 * if (h2.getKicker().get(eCardNo.SecondCard.getCardNo()) != null) {
-		 * if (h1.getKicker().get(eCardNo.SecondCard.getCardNo()) != null) {
-		 * result =
-		 * h2.getKicker().get(eCardNo.SecondCard.getCardNo()).getRank().
-		 * getRank() -
-		 * h1.getKicker().get(eCardNo.SecondCard.getCardNo()).getRank().
-		 * getRank(); } if (result != 0) { return result; } } /* if
-		 * (h2.getKicker().get(eCardNo.ThirdCard.getCardNo()) != null) { if
-		 * (h1.getKicker().get(eCardNo.ThirdCard.getCardNo()) != null) {
-		 * result =
-		 * h2.getKicker().get(eCardNo.ThirdCard.getCardNo()).getRank().
-		 * getRank() -
-		 * h1.getKicker().get(eCardNo.ThirdCard.getCardNo()).getRank().
-		 * getRank(); } if (result != 0) { return result; } }
-		 * 
-		 * if (h2.getKicker().get(eCardNo.FourthCard.getCardNo()) != null) {
-		 * if (h1.getKicker().get(eCardNo.FourthCard.getCardNo()) != null) {
-		 * result =
-		 * h2.getKicker().get(eCardNo.FourthCard.getCardNo()).getRank().
-		 * getRank() -
-		 * h1.getKicker().get(eCardNo.FourthCard.getCardNo()).getRank().
-		 * getRank(); } if (result != 0) { return result; } }
-		 * 
-		 * }
-		 */
-		return 0;
-	}
+
+		
+		if ((h2.Kickers == null) || (h1.Kickers == null))
+		{
+			return 0;
+		}
+		
+
+		try
+		{
+			if (h2.Kickers.size() >= eCardNo.FirstCard.getCardNo() +1 )
+			{
+				if (h1.Kickers.size() >= eCardNo.FirstCard.getCardNo() +1)
+				{
+					result = h2.getKicker().get(eCardNo.FirstCard.getCardNo()).getRank().getRank() - h1.getKicker().get(eCardNo.FirstCard.getCardNo()).getRank().getRank();
+				}
+				if (result != 0)
+				{
+					return result;
+				}
+			}				
+		}
+		catch (Exception e)
+		{				
+			System.out.println(e.getMessage());
+			throw new RuntimeException(e);
+		}			
+
+		
+		try
+		{
+			if (h2.Kickers.size() >= eCardNo.SecondCard.getCardNo() +1 )
+			{
+				if (h1.Kickers.size() >= eCardNo.SecondCard.getCardNo() +1)
+				{
+					result = h2.getKicker().get(eCardNo.SecondCard.getCardNo()).getRank().getRank() - h1.getKicker().get(eCardNo.SecondCard.getCardNo()).getRank().getRank();
+				}
+				if (result != 0)
+				{
+					return result;
+				}
+			}				
+		}
+		catch (Exception e)
+		{
+			System.out.println(e.getMessage());
+			throw new RuntimeException(e);				
+		}			
+		
+		try
+		{
+			if (h2.Kickers.size() >= eCardNo.ThirdCard.getCardNo() +1 )
+			{
+				if (h1.Kickers.size() >= eCardNo.ThirdCard.getCardNo() +1)
+				{
+					result = h2.getKicker().get(eCardNo.ThirdCard.getCardNo()).getRank().getRank() - h1.getKicker().get(eCardNo.ThirdCard.getCardNo()).getRank().getRank();
+				}
+				if (result != 0)
+				{
+					return result;
+				}
+			}				
+		}
+		catch (Exception e)
+		{
+			System.out.println(e.getMessage());
+			throw new RuntimeException(e);
+		}
+		
+		try
+		{
+			if (h2.Kickers.size() >= eCardNo.FourthCard.getCardNo() +1 )
+			{
+				if (h1.Kickers.size() >= eCardNo.FourthCard.getCardNo() +1)
+				{
+					result = h2.getKicker().get(eCardNo.FourthCard.getCardNo()).getRank().getRank() - h1.getKicker().get(eCardNo.FourthCard.getCardNo()).getRank().getRank();
+				}
+				if (result != 0)
+				{
+					return result;
+				}
+			}				
+		}
+		catch (Exception e)
+		{
+			System.out.println(e.getMessage());
+			throw new RuntimeException(e);				
+		}
+		
+		return 0; 
+	};
+
 };
+}
+

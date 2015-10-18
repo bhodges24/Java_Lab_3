@@ -381,11 +381,11 @@ public class Hand_Test {
 		Hand my_hand = new Hand();
 		my_hand.AddCardToHand(new Card(eSuit.CLUBS,eRank.TEN,0));
 		my_hand.AddCardToHand(new Card(eSuit.DIAMONDS,eRank.KING,0));
-		my_hand.AddCardToHand(new Card(eSuit.SPADES,eRank.THREE,0));
+		my_hand.AddCardToHand(new Card(eSuit.SPADES,eRank.THREE,true));
 		my_hand.AddCardToHand(new Card(eSuit.HEARTS,eRank.TWO,0));
 		my_hand.AddCardToHand(new Card(eSuit.CLUBS,eRank.ACE,0));
 		
-		BestHandEval(my_hand);
+		assertTrue(Hand.BestHandEval(my_hand).getHandStrength() == eHandStrength.Pair.getHandStrength());
 	}
 }
 
