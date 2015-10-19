@@ -33,6 +33,17 @@ public class Hand {
 	
 	private int isNatural = 1;
 	
+	public ArrayList<Card> getBestCardsInHand(){
+		return BestCardsInHand;
+	}
+	
+	public int getIsNatural() {
+		return isNatural;
+	}
+	public void setNotNatural() {
+		this.isNatural = 0;
+	}
+
 	private boolean Flush;
 	private boolean Straight;
 	private boolean Ace;
@@ -185,7 +196,7 @@ public class Hand {
 		//Check if my_hand is natural
 		for(Card card : my_hand.getCards()){
 			if(card.getRank() == eRank.JOKER  || card.getWild() == true){
-				my_hand.isNatural = 0;
+				my_hand.setNotNatural();
 			}
 		}
 		
@@ -209,6 +220,9 @@ public class Hand {
 		//Sort the evaluated hands by HandRank
 		Collections.sort(eval_hands, Hand.HandRank);
 		
+		//Set BestCardsInHand
+		my_hand.BestCardsInHand = eval_hands.get(0).getCards();
+				
 		//Return best scored hand
 		return eval_hands.get(0);
 	}
@@ -372,8 +386,23 @@ public class Hand {
 					CardsInHand.get(eCardNo.FirstCard.getCardNo()).getRank()
 							.getRank(), 0, remainingCards);
 		}
-
-		// Straight
+		//High straight with ace
+		else if (Straight && Ace && 
+				CardsInHand.get(eCardNo.FifthCard.getCardNo()).getRank() == eRank.TEN){
+			remainingCards = null;
+			ScoreHand(eHandStrength.Straight,
+					CardsInHand.get(eCardNo.FirstCard.getCardNo()).getRank()
+							.getRank(), 0, remainingCards);
+		}
+		//low straight with ace
+		else if (Straight && Ace){
+			remainingCards = null;
+			ScoreHand(eHandStrength.Straight,
+					CardsInHand.get(eCardNo.SecondCard.getCardNo()).getRank()
+							.getRank(), 0, remainingCards);
+		}
+		
+		// Straight without Ace
 		
 		else if (Straight) {
 			remainingCards = null;
